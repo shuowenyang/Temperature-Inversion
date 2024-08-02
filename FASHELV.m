@@ -1,0 +1,88 @@
+clc;
+clear;
+rng(1);%设置随机种子
+
+
+falg = zeros(243,6);
+
+num = 0;
+for j = 1 : 243
+    for i = 2 : 6
+        falg(j,i) = num;
+        if(num == 1)
+            num = -1;
+        else
+            num = num + 1;
+        end
+    end
+end
+fashelv = [];
+temp = zeros(1,6);
+
+for i = 1:243
+    for j = 1 : 2
+        tempnum = rand(1) * (0.9 - 0.4) + 0.4;
+        temp(1) = tempnum;
+        for k = 2 : 6
+            if(falg(i,k) == -1)
+                tempnum = rand(1) * (temp(k - 1) - 0.4) + 0.4;
+            else if (falg(i,k) == 0)
+                    tempnum = temp(k - 1);
+            else if(falg(i,k) == 1)
+                    tempnum = rand(1) * (0.9 - temp(k - 1) ) + temp(k - 1);
+            end
+            
+            end
+            end
+            temp(k) = tempnum;
+        end
+        fashelv = [fashelv;temp];
+    end
+end
+
+cc1=3.7417749e4; %W·m^2
+cc2=1.438769e4; % um·K
+lambda = [3.75, 3.95, 4.15, 4.35, 4.55, 4.75];
+
+load("kkk.mat");
+t_t = [];
+for i = 300 : 20 : 1200
+    t_t = [t_t, i];    
+end
+t_k = t_t + 273.15;
+% t_k = t_t + 273.15;
+% t_k = [600 700 800];
+% data_E = [];
+data_K = [];
+data0 = [];
+for TK = t_k
+    Mb = cc1 ./(lambda.^5)./(exp(cc2 ./(lambda*TK))-1);
+    T_gray = Mb .* kkk;
+    % Gaussnoise = normrnd(T_gray, (0.005*T_gray));
+    % data0 = [data0;Gaussnoise];
+    % for j = 1 : 10
+    %     Gaussnoise = normrnd(T_gray, (0.05*T_gray));
+    % 
+    %     data_E = [data_E;Gaussnoise];
+    %     data_K = [data_K;TK];
+    % end
+    data0 = [data0;T_gray];
+    data_K = [data_K;TK];
+end
+data_output = [];
+data_output_K = [];
+for i = 1: 486
+    for j = 1 : 46
+            temp = fashelv(i,:) .* data0(j,:);
+            data_output = [data_output;temp];
+            data_output_K = [data_output_K;data_K(j)];
+    end
+end
+% plot(data_K, data0);
+% plot(1:6,fashelv);
+
+save data_wangluo_313_2 data_output data_output_K data0 data_K lambda cc1 cc2;
+    
+
+        
+    
